@@ -12,7 +12,6 @@
 namespace Sylius\Bundle\TaxonomyBundle\Doctrine\ORM;
 
 use Sylius\Bundle\ResourceBundle\Doctrine\ORM\EntityRepository;
-use Sylius\Component\Taxonomy\Model\TaxonInterface;
 use Sylius\Component\Taxonomy\Repository\TaxonRepositoryInterface;
 
 /**
@@ -35,6 +34,24 @@ class TaxonRepository extends EntityRepository implements TaxonRepositoryInterfa
             ->andWhere('parent.code = :parentCode')
             ->addOrderBy('o.position')
             ->setParameter('parentCode', $parentCode)
+        ;
+
+        return $queryBuilder->getQuery()->getResult();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function findChildrenByRootCode($rootCode)
+    {
+        $queryBuilder = $this->createQueryBuilder('o');
+        $queryBuilder
+            ->addSelect('translation')
+            ->leftJoin('o.translations', 'translation')
+            ->leftJoin('o.root', 'root')
+            ->andWhere('root.code = :rootCode')
+            ->addOrderBy('o.position')
+            ->setParameter('rootCode', $rootCode)
         ;
 
         return $queryBuilder->getQuery()->getResult();
@@ -97,7 +114,7 @@ class TaxonRepository extends EntityRepository implements TaxonRepositoryInterfa
             ->addOrderBy('o.left')
             ->addOrderBy('o.position')
         ;
-    
+
         return $queryBuilder->getQuery()->getResult();
     }
 

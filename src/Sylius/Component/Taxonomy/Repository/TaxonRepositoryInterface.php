@@ -31,6 +31,13 @@ interface TaxonRepositoryInterface extends RepositoryInterface
     public function findChildren($parentCode);
 
     /**
+     * @param string $rootCode
+     *
+     * @return TaxonInterface[]
+     */
+    public function findChildrenByRootCode($rootCode);
+
+    /**
      * @return TaxonInterface[]
      */
     public function findRootNodes();
@@ -39,7 +46,7 @@ interface TaxonRepositoryInterface extends RepositoryInterface
      * @return TaxonInterface[]
      */
     public function findNodesTreeSorted();
-    
+
     /**
      * @param string $slug
      *
