@@ -16,7 +16,6 @@ use Sylius\Component\Taxonomy\Repository\TaxonRepositoryInterface;
 use Symfony\Bridge\Doctrine\Form\DataTransformer\CollectionToArrayTransformer;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
-use Symfony\Component\Form\Extension\Core\ChoiceList\ObjectChoiceList;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
@@ -81,7 +80,14 @@ final class TaxonChoiceType extends AbstractType
         $resolver
             ->setDefaults([
                 'choices' => function (Options $options) {
-                    $taxons = $this->taxonRepository->findNodesTreeSorted();
+                    if (null !== $options['root']) {
+                        if ($options['root'] instanceof TaxonInterface) {
+                            $options['root'] = $options['root']->getCode();
+                        }
+                        $taxons = $this->taxonRepository->findChildrenByRootCode($options['root']);
+                    } else {
+                        $taxons = $this->taxonRepository->findNodesTreeSorted();
+                    }
 
                     if (null !== $options['filter']) {
                         $taxons = array_filter($taxons, $options['filter']);
