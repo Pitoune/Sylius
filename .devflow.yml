@@ -1,0 +1,36 @@
+stack:
+  nginx:
+    document_root: web
+    index: app.php
+
+  php:
+    version: 5.6
+    modules:
+      - pdo_mysql
+      - exif
+      - fileinfo
+      - gd
+      - intl
+    deployment:
+      install:
+        - composer install --prefer-dist --no-interaction --optimize-autoloader
+        - php -d memory_limit=-1 bin/console sylius:install --no-interaction --env=prod
+        - php bin/console sylius:fixtures:load default --no-interaction --env=prod
+        - sudo apt-get install -y apt-transport-https
+        - curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+        - echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+        - sudo apt-get update -y
+        - sudo apt-get install -y yarn
+        - curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
+        - sudo apt-get update -y
+        - sudo apt-get install -y nodejs
+        - yarn install
+        - yarn run gulp
+        - mkdir -p var/cache var/logs var/sessions
+
+  mysql:
+    version: 5.5
+    user: sylius
+    password: sylius
+    databases:
+      - sylius
