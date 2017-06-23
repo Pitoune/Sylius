@@ -34,5 +34,6 @@ final class SyliusTaxonomyExtension extends AbstractResourceExtension
         $this->registerResources('sylius', $config['driver'], $config['resources'], $container);
 
         $loader->load('services.xml');
+        $loader->load('services/validators.xml');
     }
 }
